@@ -1,4 +1,4 @@
-// File: C:\Users\bhaga\OneDrive\Desktop\credit_managment\credit_risk\frontend\app\layout.js
+// File: C:\Users\bhaga\OneDrive\Desktop\credit_managment\frontend\app\layout.js
 import * as entry from '../../../app/layout.js'
 import type { ResolvingMetadata, ResolvingViewport } from 'next/dist/lib/metadata/types/metadata-interface.js'
 
