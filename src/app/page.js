@@ -131,43 +131,24 @@ export default function ScardLandingPage({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 1.3 }}
               >
+                {/* Primary CTA */}
                 <motion.button
-                  className="group relative px-8 py-3 rounded-full text-black font-extrabold flex items-center justify-center space-x-3 shadow-2xl transition-all duration-300 overflow-hidden"
-                  style={{
-                    background:
-                      "linear-gradient(135deg, #84cc16 0%, #a855f7 50%, #6366f1 100%)",
-                  }}
+                  className="relative inline-flex items-center justify-center gap-3 rounded-full px-8 py-3.5 text-sm font-semibold text-black bg-gradient-to-r from-lime-400 via-purple-400 to-indigo-500 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-lime-400/40 transition-shadow"
                   onClick={() => router.push("/getstarted")}
-                  whileHover={{
-                    scale: 1.05,
-                    boxShadow: "0 0 30px rgba(132, 204, 22, 0.6)",
-                  }}
-                  whileTap={{ scale: 0.98 }}
+                  whileTap={{ scale: 0.97 }}
                 >
-                  <motion.div className="absolute inset-0 bg-gradient-to-r from-purple-500 via-violet-500 to-lime-400 opacity-0 group-hover:opacity-100 transition-opacity duration-300" />
-                  <span className="relative z-10 text-lg group-hover:text-white transition-colors">
-                    Try the Live Demo
-                  </span>
-                  <motion.div
-                    animate={{ x: [0, 4, 0] }}
-                    transition={{
-                      duration: 2,
-                      repeat: Infinity,
-                      ease: "easeInOut",
-                    }}
-                  >
-                    <ArrowRight className="relative z-10 w-5 h-5 group-hover:translate-x-2 transition-transform" />
-                  </motion.div>
+                  <span>Try the Live Demo</span>
+                  <ArrowRight className="w-5 h-5" />
                 </motion.button>
 
+                {/* Secondary CTA */}
                 <motion.button
-                  className="group bg-gradient-to-r from-lime-400 via-purple-400 to-purple-900 px-8 py-3 rounded-full text-black font-extrabold flex items-center space-x-3 shadow-2xl hover:from-purple-700 hover:to-lime-400 hover:text-white transition-all duration-300 transform hover:scale-110 animate-glow"
+                  className="relative inline-flex items-center justify-center gap-2 rounded-full px-8 py-3.5 text-sm font-medium text-white/80 border border-white/25 hover:text-white hover:border-lime-400/50 focus:outline-none focus:ring-4 focus:ring-purple-400/30 transition-colors"
                   onClick={() => router.push("/howtouse")}
-                  whileHover={{ scale: 1.05 }}
-                  whileTap={{ scale: 0.98 }}
+                  whileTap={{ scale: 0.97 }}
                 >
-                  <span className="text-lg">How to use this</span>
-                  <ArrowRight className="w-5 h-5 group-hover:translate-x-2 transition-transform" />
+                  <span>How to use this</span>
+                  <ArrowRight className="w-5 h-5" />
                 </motion.button>
               </motion.div>
             </motion.div>
