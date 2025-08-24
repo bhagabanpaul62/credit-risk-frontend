@@ -85,7 +85,7 @@ export default function HowToUsePage() {
                 <p className="text-gray-300 mb-4">
                   The Credit Risk Scoring System uses machine learning to
                   predict creditworthiness based on financial and demographic
-                  data. It's designed to help:
+                  data. It&apos;s designed to help:
                 </p>
                 <ul className="space-y-3">
                   {[
