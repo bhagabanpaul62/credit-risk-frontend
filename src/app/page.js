@@ -155,7 +155,7 @@ export default function ScardLandingPage({
 
             {/* Right Content - Enhanced 3-Card Showcase */}
             <motion.div
-              className="relative lg:block mt-10 md:mt-0 "
+              className="relative lg:block mt-10 md:mt-0 mb-[36vh]"
               initial={{ opacity: 0, x: 60 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{
@@ -166,7 +166,7 @@ export default function ScardLandingPage({
             >
               {/* Floating Elements */}
               <motion.div
-                className="absolute -top-8 -right-8 z-30"
+                className="absolute mt-[14vh] -top-8 -right-8 z-30"
                 animate={{
                   rotate: [0, 180, 360],
                   scale: [1, 1.1, 1],

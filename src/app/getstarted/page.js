@@ -199,7 +199,7 @@ export default function GetStarted() {
     setLoading(true);
     setError(null);
     setResult(null);
-    
+
     const payload = {};
     Object.keys(formData).forEach((k) => {
       const raw = formData[k];
@@ -217,7 +217,8 @@ export default function GetStarted() {
     });
 
     try {
-      const base = process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
+      const base =
+        process.env.NEXT_PUBLIC_API_BASE_URL || "http://127.0.0.1:8000";
       const res = await axios.post(`${base}/predict`, payload, {
         headers: { "Content-Type": "application/json" },
       });
@@ -232,7 +233,7 @@ export default function GetStarted() {
 
   // Get fields for current step
   function getFieldsForStep(step) {
-    return fieldMeta.filter(field => field.step === step);
+    return fieldMeta.filter((field) => field.step === step);
   }
 
   // Calculate dynamic assessment data based on result and formData
@@ -241,31 +242,36 @@ export default function GetStarted() {
 
     const badProb = result.probability_bad || 0;
     const goodProb = result.probability_good || 0;
-    
+
     // Calculate credit score (inverse relationship with bad probability)
-    const creditScore = Math.round(900 - (badProb * 400)); // Scale from 500-900
-    
+    const creditScore = Math.round(900 - badProb * 400); // Scale from 500-900
+
     // Determine risk level
-    const riskLevel = badProb < 0.2 ? 'Low Risk' : badProb < 0.5 ? 'Medium Risk' : 'High Risk';
-    const riskColor = badProb < 0.2 ? 'emerald' : badProb < 0.5 ? 'amber' : 'rose';
-    
+    const riskLevel =
+      badProb < 0.2 ? "Low Risk" : badProb < 0.5 ? "Medium Risk" : "High Risk";
+    const riskColor =
+      badProb < 0.2 ? "emerald" : badProb < 0.5 ? "amber" : "rose";
+
     // Calculate score percentage for circular progress
     const scorePercentage = Math.round((creditScore / 900) * 100);
-    
+
     // Generate key factors based on form data
     const keyFactors = [];
-    
+
     // Income factor
     if (formData.annual_income) {
       const income = parseFloat(formData.annual_income);
-      const incomeScore = Math.min(95, Math.max(30, (income / 100000) * 80 + 20));
+      const incomeScore = Math.min(
+        95,
+        Math.max(30, (income / 100000) * 80 + 20)
+      );
       keyFactors.push({
         label: "Annual Income Level",
         value: Math.round(incomeScore),
-        negative: incomeScore < 50
+        negative: incomeScore < 50,
       });
     }
-    
+
     // Employment stability
     if (formData.employment_years) {
       const years = parseFloat(formData.employment_years);
@@ -273,10 +279,10 @@ export default function GetStarted() {
       keyFactors.push({
         label: "Employment Stability",
         value: Math.round(employmentScore),
-        negative: employmentScore < 50
+        negative: employmentScore < 50,
       });
     }
-    
+
     // Credit utilization
     if (formData.balance_high_credit_pct !== "") {
       const util = parseFloat(formData.balance_high_credit_pct) || 0;
@@ -284,40 +290,61 @@ export default function GetStarted() {
       keyFactors.push({
         label: "Credit Utilization",
         value: Math.round(utilScore),
-        negative: util > 50
+        negative: util > 50,
       });
     }
-    
+
     // Payment history
-    const delinquencies = (parseFloat(formData.delinquency_30_60_24m) || 0) + 
-                         (parseFloat(formData.delinquency_90d_24m) || 0);
+    const delinquencies =
+      (parseFloat(formData.delinquency_30_60_24m) || 0) +
+      (parseFloat(formData.delinquency_90d_24m) || 0);
     if (delinquencies >= 0) {
-      const paymentScore = Math.max(20, 95 - (delinquencies * 20));
+      const paymentScore = Math.max(20, 95 - delinquencies * 20);
       keyFactors.push({
         label: "Payment History",
         value: Math.round(paymentScore),
-        negative: delinquencies > 2
+        negative: delinquencies > 2,
       });
     }
-    
+
     // Derogatory marks
     if (formData.derogatory_marks !== "") {
       const derogs = parseFloat(formData.derogatory_marks) || 0;
-      const derogScore = Math.max(15, 85 - (derogs * 25));
+      const derogScore = Math.max(15, 85 - derogs * 25);
       keyFactors.push({
         label: "Credit Report Issues",
         value: Math.round(derogScore),
-        negative: derogs > 1
+        negative: derogs > 1,
       });
     }
 
     // Generate factor analysis data
     const factorAnalysis = [
-      { k: "Payment History", v: keyFactors.find(f => f.label === "Payment History")?.value || 75 },
-      { k: "Credit Utilization", v: keyFactors.find(f => f.label === "Credit Utilization")?.value || 65 },
-      { k: "Income Level", v: keyFactors.find(f => f.label === "Annual Income Level")?.value || 70 },
-      { k: "Employment", v: keyFactors.find(f => f.label === "Employment Stability")?.value || 60 },
-      { k: "Account Management", v: Math.max(20, 80 - (parseFloat(formData.derogatory_marks) || 0) * 15) }
+      {
+        k: "Payment History",
+        v: keyFactors.find((f) => f.label === "Payment History")?.value || 75,
+      },
+      {
+        k: "Credit Utilization",
+        v:
+          keyFactors.find((f) => f.label === "Credit Utilization")?.value || 65,
+      },
+      {
+        k: "Income Level",
+        v:
+          keyFactors.find((f) => f.label === "Annual Income Level")?.value ||
+          70,
+      },
+      {
+        k: "Employment",
+        v:
+          keyFactors.find((f) => f.label === "Employment Stability")?.value ||
+          60,
+      },
+      {
+        k: "Account Management",
+        v: Math.max(20, 80 - (parseFloat(formData.derogatory_marks) || 0) * 15),
+      },
     ].sort((a, b) => b.v - a.v);
 
     return {
@@ -332,8 +359,8 @@ export default function GetStarted() {
       riskDistribution: {
         low: Math.round(goodProb * 100),
         medium: Math.round((1 - goodProb - badProb) * 100),
-        high: Math.round(badProb * 100)
-      }
+        high: Math.round(badProb * 100),
+      },
     };
   }
 
@@ -349,7 +376,7 @@ export default function GetStarted() {
   );
 
   return (
-    <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-white to-violet-100 text-slate-800 relative overflow-x-hidden">
+    <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-white to-violet-100 text-slate-800 relative overflow-x-hidden text-sm sm:text-base">
       <Blobs />
 
       {/* Hero */}
@@ -357,26 +384,26 @@ export default function GetStarted() {
         id="home"
         className="w-full border-b bg-gradient-to-b from-white via-violet-50 to-white relative z-10"
       >
-        <div className="mx-auto max-w-6xl px-4 py-12 md:py-16 grid md:grid-cols-2 gap-8 items-center">
-          <div className="space-y-6">
-            <h1 className="text-3xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow">
+        <div className="mx-auto max-w-6xl px-2 sm:px-4 py-8 sm:py-12 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+          <div className="space-y-4 sm:space-y-6">
+            <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow">
               Check your credit score instantly.
             </h1>
-            <p className="text-base md:text-lg text-slate-600 max-w-md">
+            <p className="text-sm sm:text-base md:text-lg text-slate-600 max-w-md">
               Our advanced AI analyzes your financial data to provide accurate
               credit risk assessment in minutes.
             </p>
             <div>
               <Link
                 href="#wizard"
-                className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-500 px-6 py-3 text-base font-semibold text-white shadow-lg hover:scale-105 hover:from-indigo-700 hover:to-violet-600 transition-all duration-200"
+                className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-500 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white shadow-lg hover:scale-105 hover:from-indigo-700 hover:to-violet-600 transition-all duration-200"
               >
                 Get Started <FaArrowRight />
               </Link>
             </div>
           </div>
-          <div className="flex justify-center">
-            <div className="relative w-full max-w-md aspect-[4/3] drop-shadow-xl">
+          <div className="flex justify-center mt-6 md:mt-0">
+            <div className="relative w-full max-w-xs sm:max-w-md aspect-[4/3] drop-shadow-xl">
               <Image
                 src="/window.svg"
                 alt="Hero"
@@ -392,9 +419,9 @@ export default function GetStarted() {
       {/* Wizard Section */}
       <section
         id="wizard"
-        className="relative z-10 mx-auto max-w-6xl w-full px-4 py-12 space-y-6"
+        className="relative z-10 mx-auto max-w-6xl w-full px-2 sm:px-4 py-8 sm:py-12 space-y-6"
       >
-        <h2 className="text-center text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow mb-2">
+        <h2 className="text-center text-xl sm:text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow mb-2">
           Predict Your Credit Risk
         </h2>
         {/* Stepper */}
@@ -429,7 +456,7 @@ export default function GetStarted() {
         </div>
 
         {/* Card */}
-        <div className="rounded-2xl border shadow-xl p-6 md:p-10 bg-white/70 backdrop-blur-lg transition-all duration-500 ring-1 ring-indigo-100">
+        <div className="rounded-2xl border shadow-xl p-4 sm:p-6 md:p-10 bg-white/70 backdrop-blur-lg transition-all duration-500 ring-1 ring-indigo-100">
           {currentStep === 1 && (
             <>
               <h3 className="text-lg font-semibold mb-4 text-indigo-700 flex items-center gap-2">
@@ -440,7 +467,10 @@ export default function GetStarted() {
                 onSubmit={handleSubmit}
               >
                 {getFieldsForStep(1).map((field) => (
-                  <div key={field.key} className={field.key === 'age' ? "md:col-span-2" : ""}>
+                  <div
+                    key={field.key}
+                    className={field.key === "age" ? "md:col-span-2" : ""}
+                  >
                     <label className="block text-xs mb-1 font-medium text-slate-700">
                       {field.label}
                     </label>
@@ -519,7 +549,8 @@ export default function GetStarted() {
           {currentStep === 3 && (
             <>
               <h3 className="text-lg font-semibold mb-4 text-indigo-700 flex items-center gap-2">
-                <FaChartLine className="text-violet-500" /> Step 3: Credit History
+                <FaChartLine className="text-violet-500" /> Step 3: Credit
+                History
               </h3>
               <form
                 className="grid grid-cols-1 md:grid-cols-2 gap-6"
@@ -577,21 +608,23 @@ export default function GetStarted() {
           {currentStep === 4 && (
             <>
               <h3 className="text-lg font-semibold mb-4 text-indigo-700 flex items-center gap-2">
-                <FaClipboardCheck className="text-violet-500" /> Step 4: Review &
-                Submit
+                <FaClipboardCheck className="text-violet-500" /> Step 4: Review
+                & Submit
               </h3>
-              
+
               {/* Show error if any */}
               {error && (
                 <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
                   <p className="text-red-700 font-medium">Error: {error}</p>
                 </div>
               )}
-              
+
               {/* Show results if available */}
               {result && (
                 <div className="mb-6 p-6 bg-green-50 border border-green-200 rounded-lg">
-                  <h4 className="text-lg font-semibold text-green-800 mb-4">Prediction Result</h4>
+                  <h4 className="text-lg font-semibold text-green-800 mb-4">
+                    Prediction Result
+                  </h4>
                   <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
                     <div className="flex justify-between">
                       <span className="text-green-600">Status:</span>
@@ -602,27 +635,39 @@ export default function GetStarted() {
                       <span className="font-semibold">{result.prediction}</span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-green-600">Bad Risk Probability:</span>
-                      <span className="font-semibold">{(result.probability_bad * 100).toFixed(2)}%</span>
+                      <span className="text-green-600">
+                        Bad Risk Probability:
+                      </span>
+                      <span className="font-semibold">
+                        {(result.probability_bad * 100).toFixed(2)}%
+                      </span>
                     </div>
                     <div className="flex justify-between">
-                      <span className="text-green-600">Good Risk Probability:</span>
-                      <span className="font-semibold">{(result.probability_good * 100).toFixed(2)}%</span>
+                      <span className="text-green-600">
+                        Good Risk Probability:
+                      </span>
+                      <span className="font-semibold">
+                        {(result.probability_good * 100).toFixed(2)}%
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-green-600">Threshold:</span>
-                      <span className="font-semibold">{result.threshold_used}</span>
+                      <span className="font-semibold">
+                        {result.threshold_used}
+                      </span>
                     </div>
                     <div className="flex justify-between">
                       <span className="text-green-600">Model Version:</span>
-                      <span className="font-semibold">{result.model_version}</span>
+                      <span className="font-semibold">
+                        {result.model_version}
+                      </span>
                     </div>
                   </div>
                 </div>
               )}
-              
+
               {!result && (
-                <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm mb-6">
+                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-sm mb-6">
                   {fieldMeta.map((field) => (
                     <div
                       key={field.key}
@@ -636,7 +681,7 @@ export default function GetStarted() {
                   ))}
                 </div>
               )}
-              
+
               <div className="flex justify-between">
                 <button
                   type="button"
@@ -664,11 +709,11 @@ export default function GetStarted() {
 
       {/* Dynamic Assessment Section - Only show when result is available */}
       {assessmentData && (
-        <section className="mx-auto max-w-6xl w-full px-4 pb-12 space-y-6 relative z-10">
-          <h2 className="text-center text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow mb-2">
+        <section className="mx-auto max-w-6xl w-full px-2 sm:px-4 pb-8 sm:pb-12 space-y-6 relative z-10">
+          <h2 className="text-center text-xl sm:text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow mb-2">
             Your Credit Risk Assessment
           </h2>
-          <div className="grid md:grid-cols-2 gap-6">
+          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
             {/* Dynamic Credit Score */}
             <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
               <h4 className="text-base font-semibold mb-4 text-indigo-700">
@@ -684,8 +729,13 @@ export default function GetStarted() {
                     <path
                       d="M18 2 a 16 16 0 1 1 0 32"
                       fill="none"
-                      stroke={`${assessmentData.riskColor === 'emerald' ? '#22c55e' : 
-                              assessmentData.riskColor === 'amber' ? '#f59e0b' : '#ef4444'}`}
+                      stroke={`${
+                        assessmentData.riskColor === "emerald"
+                          ? "#22c55e"
+                          : assessmentData.riskColor === "amber"
+                          ? "#f59e0b"
+                          : "#ef4444"
+                      }`}
                       strokeWidth="4"
                       strokeDasharray={`${assessmentData.scorePercentage} 100`}
                       strokeLinecap="round"
@@ -693,7 +743,9 @@ export default function GetStarted() {
                   </svg>
                   <div className="absolute inset-0 grid place-items-center">
                     <div className="text-center">
-                      <div className={`text-3xl font-bold text-${assessmentData.riskColor}-600`}>
+                      <div
+                        className={`text-3xl font-bold text-${assessmentData.riskColor}-600`}
+                      >
                         {assessmentData.creditScore}
                       </div>
                       <div className="text-xs text-zinc-500">out of 900</div>
@@ -702,15 +754,19 @@ export default function GetStarted() {
                 </div>
                 <div className="text-xs text-zinc-600">
                   <div className="flex items-center gap-2 mb-2">
-                    {["#ef4444", "#f59e0b", "#22c55e", "#16a34a"].map((c, i) => (
-                      <div
-                        key={i}
-                        className="h-2 w-8 rounded"
-                        style={{ backgroundColor: c }}
-                      />
-                    ))}
+                    {["#ef4444", "#f59e0b", "#22c55e", "#16a34a"].map(
+                      (c, i) => (
+                        <div
+                          key={i}
+                          className="h-2 w-8 rounded"
+                          style={{ backgroundColor: c }}
+                        />
+                      )
+                    )}
                   </div>
-                  <div className={`rounded bg-${assessmentData.riskColor}-50 text-${assessmentData.riskColor}-700 px-2 py-1 inline-block font-semibold`}>
+                  <div
+                    className={`rounded bg-${assessmentData.riskColor}-50 text-${assessmentData.riskColor}-700 px-2 py-1 inline-block font-semibold`}
+                  >
                     {assessmentData.riskLevel}
                   </div>
                   <div className="text-[11px] text-zinc-500 mt-1">
@@ -742,7 +798,9 @@ export default function GetStarted() {
                         <span className="text-zinc-700">{factor.label}</span>
                         <span
                           className={`font-semibold ${
-                            factor.negative ? "text-rose-600" : "text-emerald-600"
+                            factor.negative
+                              ? "text-rose-600"
+                              : "text-emerald-600"
                           }`}
                         >
                           {factor.value}%
@@ -775,12 +833,23 @@ export default function GetStarted() {
                   <div key={factor.k} className="text-xs">
                     <div className="flex items-center justify-between mb-1">
                       <span>{factor.k}</span>
-                      <span className="text-zinc-500">{Math.round(factor.v)}</span>
+                      <span className="text-zinc-500">
+                        {Math.round(factor.v)}
+                      </span>
                     </div>
                     <div className="h-2 rounded bg-zinc-100">
                       <div
                         className="h-2 rounded bg-indigo-500"
-                        style={{ width: `${Math.min(100, (factor.v / Math.max(...assessmentData.factorAnalysis.map(f => f.v))) * 100)}%` }}
+                        style={{
+                          width: `${Math.min(
+                            100,
+                            (factor.v /
+                              Math.max(
+                                ...assessmentData.factorAnalysis.map((f) => f.v)
+                              )) *
+                              100
+                          )}%`,
+                        }}
                       />
                     </div>
                   </div>
@@ -821,7 +890,12 @@ export default function GetStarted() {
                       stroke="#ef4444"
                       strokeWidth="4"
                       strokeDasharray={`${assessmentData.riskDistribution.high} 100`}
-                      strokeDashoffset={-(assessmentData.riskDistribution.low + assessmentData.riskDistribution.medium)}
+                      strokeDashoffset={
+                        -(
+                          assessmentData.riskDistribution.low +
+                          assessmentData.riskDistribution.medium
+                        )
+                      }
                     />
                   </svg>
                 </div>
@@ -848,7 +922,7 @@ export default function GetStarted() {
             <h4 className="text-base font-semibold mb-4 text-indigo-700">
               Assessment Summary
             </h4>
-            <div className="grid md:grid-cols-3 gap-6 text-sm">
+            <div className="grid md:grid-cols-3 gap-4 sm:gap-6 text-sm">
               <div className="text-center p-4 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50">
                 <div className="text-2xl font-bold text-indigo-600 mb-1">
                   {result.prediction}
@@ -865,16 +939,25 @@ export default function GetStarted() {
                 <div className="text-2xl font-bold text-emerald-600 mb-1">
                   {result.threshold_used}
                 </div>
-                <div className="text-xs text-emerald-500">Decision Threshold</div>
+                <div className="text-xs text-emerald-500">
+                  Decision Threshold
+                </div>
               </div>
             </div>
             <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-slate-50 to-gray-50 border-l-4 border-indigo-500">
               <p className="text-sm text-slate-600">
-                <strong className="text-indigo-700">Assessment Complete:</strong> Your credit risk analysis is based on {fieldMeta.filter(f => formData[f.key] !== "").length} data points. 
-                The model shows a {assessmentData.badProbability}% probability of default risk. 
-                {assessmentData.badProbability < 20 ? " This indicates strong creditworthiness." : 
-                 assessmentData.badProbability < 50 ? " This suggests moderate credit risk that may require additional review." : 
-                 " This indicates higher risk that may impact credit decisions."}
+                <strong className="text-indigo-700">
+                  Assessment Complete:
+                </strong>{" "}
+                Your credit risk analysis is based on{" "}
+                {fieldMeta.filter((f) => formData[f.key] !== "").length} data
+                points. The model shows a {assessmentData.badProbability}%
+                probability of default risk.
+                {assessmentData.badProbability < 20
+                  ? " This indicates strong creditworthiness."
+                  : assessmentData.badProbability < 50
+                  ? " This suggests moderate credit risk that may require additional review."
+                  : " This indicates higher risk that may impact credit decisions."}
               </p>
             </div>
           </div>
@@ -882,141 +965,151 @@ export default function GetStarted() {
       )}
 
       {/* Footer */}
-      <footer className="mt-auto border-t bg-zinc-950 text-zinc-300 relative z-10">
-        <div className="mx-auto max-w-6xl px-4 py-10 grid md:grid-cols-5 gap-8 text-sm">
-          <div className="md:col-span-2 space-y-2">
-            <div className="flex items-center gap-2 text-white">
-              <div className="h-6 w-6 rounded-md bg-indigo-600 grid place-items-center text-xs font-bold">
-                A
-              </div>
-              <span className="font-semibold">CreditSense</span>
+      <footer className="mt-auto bg-gradient-to-br from-zinc-950 via-indigo-950 to-violet-950 text-zinc-200 relative z-10 border-t border-indigo-900 shadow-inner text-xs sm:text-sm">
+        <div className="mx-auto max-w-6xl px-2 sm:px-4 py-8 sm:py-12 grid grid-cols-1 md:grid-cols-5 gap-6 sm:gap-10">
+          {/* Brand */}
+          <div className="md:col-span-2 space-y-3">
+            <div className="flex items-center gap-3 text-white mb-2">
+              {/* Example SVG logo */}
+              <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg">
+                <svg width="24" height="24" fill="none" viewBox="0 0 24 24">
+                  <circle cx="12" cy="12" r="10" fill="#6366f1" />
+                  <path
+                    d="M8 13l2.5 2.5L16 10"
+                    stroke="#fff"
+                    strokeWidth="2"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                  />
+                </svg>
+              </span>
+              <span className="font-bold text-lg tracking-tight">
+                CreditSense
+              </span>
             </div>
-            <p className="text-zinc-400">
+            <p className="text-zinc-400 leading-relaxed">
               Advanced credit risk assessment platform powered by AI and machine
               learning.
             </p>
           </div>
+          {/* Resources */}
           <div>
-            <div className="font-medium text-white mb-2">Resources</div>
+            <div className="font-semibold text-indigo-300 mb-2 tracking-wide">
+              Resources
+            </div>
             <ul className="space-y-1 text-zinc-400">
               <li>
                 <a
-                  href="#"
-                  className="hover:text-white transition-colors"
-                >
-                  Blog
-                </a>
-              </li>
-              <li>
-                <a
                   href="#faq"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-indigo-300 transition-colors"
                 >
                   FAQs
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="hover:text-white transition-colors"
-                >
+                <a href="#" className="hover:text-indigo-300 transition-colors">
                   Support
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="hover:text-white transition-colors"
-                >
+                <a href="#" className="hover:text-indigo-300 transition-colors">
                   Documentation
                 </a>
               </li>
             </ul>
           </div>
+          {/* Legal */}
           <div>
-            <div className="font-medium text-white mb-2">Legal</div>
+            <div className="font-semibold text-indigo-300 mb-2 tracking-wide">
+              Legal
+            </div>
             <ul className="space-y-1 text-zinc-400">
               <li>
-                <a
-                  href="#"
-                  className="hover:text-white transition-colors"
-                >
+                <a href="#" className="hover:text-indigo-300 transition-colors">
                   Terms of Service
                 </a>
               </li>
               <li>
-                <a
-                  href="#"
-                  className="hover:text-white transition-colors"
-                >
+                <a href="#" className="hover:text-indigo-300 transition-colors">
                   Privacy Policy
                 </a>
               </li>
               <li>
                 <a
-                  href="#"
-                  className="hover:text-white transition-colors"
-                >
-                  Cookie Policy
-                </a>
-              </li>
-              <li>
-                <a
                   href="#contact"
-                  className="hover:text-white transition-colors"
+                  className="hover:text-indigo-300 transition-colors"
                 >
                   Security
                 </a>
               </li>
             </ul>
           </div>
+          {/* Connect */}
           <div>
-            <div className="font-medium text-white mb-2">Connect</div>
-            <div className="flex items-center gap-3 text-zinc-400">
+            <div className="font-semibold text-indigo-300 mb-2 tracking-wide">
+              Connect
+            </div>
+            <div className="flex items-center gap-4 mt-1">
               <a
                 href="#"
                 aria-label="Twitter"
-                className="hover:text-white transition-colors"
+                className="hover:text-sky-400 transition-colors text-xl"
               >
-                T
+                <svg
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5"
+                >
+                  <path d="M22.46 6c-.77.35-1.6.58-2.47.69a4.3 4.3 0 0 0 1.88-2.37 8.59 8.59 0 0 1-2.72 1.04A4.28 4.28 0 0 0 16.11 4c-2.37 0-4.29 1.92-4.29 4.29 0 .34.04.67.11.98C7.69 9.09 4.07 7.38 1.64 4.77c-.37.63-.58 1.36-.58 2.14 0 1.48.75 2.78 1.89 3.54a4.28 4.28 0 0 1-1.94-.54v.05c0 2.07 1.47 3.8 3.42 4.19-.36.1-.74.16-1.13.16-.28 0-.54-.03-.8-.08.54 1.68 2.11 2.9 3.97 2.93A8.6 8.6 0 0 1 2 19.54a12.13 12.13 0 0 0 6.56 1.92c7.88 0 12.2-6.53 12.2-12.2 0-.19 0-.38-.01-.57A8.7 8.7 0 0 0 24 4.59a8.48 8.48 0 0 1-2.54.7z" />
+                </svg>
               </a>
               <a
                 href="#"
                 aria-label="GitHub"
-                className="hover:text-white transition-colors"
+                className="hover:text-white transition-colors text-xl"
               >
-                G
+                <svg
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5"
+                >
+                  <path d="M12 2C6.48 2 2 6.58 2 12.26c0 4.5 2.87 8.32 6.84 9.67.5.09.68-.22.68-.48 0-.24-.01-.87-.01-1.7-2.78.62-3.37-1.36-3.37-1.36-.45-1.18-1.1-1.5-1.1-1.5-.9-.63.07-.62.07-.62 1 .07 1.53 1.06 1.53 1.06.89 1.56 2.34 1.11 2.91.85.09-.66.35-1.11.63-1.37-2.22-.26-4.56-1.14-4.56-5.07 0-1.12.39-2.03 1.03-2.75-.1-.26-.45-1.3.1-2.7 0 0 .84-.28 2.75 1.05A9.38 9.38 0 0 1 12 6.84c.85.004 1.7.12 2.5.35 1.9-1.33 2.74-1.05 2.74-1.05.55 1.4.2 2.44.1 2.7.64.72 1.03 1.63 1.03 2.75 0 3.94-2.34 4.8-4.57 5.06.36.32.68.94.68 1.9 0 1.37-.01 2.47-.01 2.8 0 .27.18.58.69.48A10.01 10.01 0 0 0 22 12.26C22 6.58 17.52 2 12 2z" />
+                </svg>
               </a>
               <a
                 href="#"
                 aria-label="LinkedIn"
-                className="hover:text-white transition-colors"
+                className="hover:text-sky-300 transition-colors text-xl"
               >
-                L
+                <svg
+                  fill="currentColor"
+                  viewBox="0 0 24 24"
+                  className="h-5 w-5"
+                >
+                  <path d="M19 0h-14c-2.76 0-5 2.24-5 5v14c0 2.76 2.24 5 5 5h14c2.76 0 5-2.24 5-5v-14c0-2.76-2.24-5-5-5zm-11 19h-3v-9h3v9zm-1.5-10.29c-.97 0-1.75-.79-1.75-1.76s.78-1.75 1.75-1.75 1.75.78 1.75 1.75-.78 1.76-1.75 1.76zm13.5 10.29h-3v-4.5c0-1.08-.02-2.47-1.5-2.47-1.5 0-1.73 1.17-1.73 2.39v4.58h-3v-9h2.88v1.23h.04c.4-.76 1.38-1.56 2.85-1.56 3.05 0 3.62 2.01 3.62 4.62v4.71z" />
+                </svg>
               </a>
             </div>
           </div>
         </div>
-        <div className="border-t border-zinc-800 text-xs text-zinc-500">
-          <div className="mx-auto max-w-6xl px-4 py-4 flex flex-col md:flex-row items-center justify-between gap-2">
-            <div>© 2025 CreditSense. All rights reserved.</div>
+        <div className="border-t border-indigo-900/50 text-xs text-zinc-400 bg-zinc-950/80">
+          <div className="mx-auto max-w-6xl px-2 sm:px-4 py-4 sm:py-5 flex flex-col md:flex-row items-center justify-between gap-2">
+            <div>
+              © 2025{" "}
+              <span className="font-semibold text-indigo-300">CreditSense</span>
+              . All rights reserved.
+            </div>
             <div className="flex items-center gap-4">
               <a
                 href="#contact"
-                className="hover:text-white transition-colors"
+                className="hover:text-indigo-300 transition-colors"
               >
                 Contact
               </a>
-              <a
-                href="#"
-                className="hover:text-white transition-colors"
-              >
+              <a href="#" className="hover:text-indigo-300 transition-colors">
                 Privacy
               </a>
-              <a
-                href="#"
-                className="hover:text-white transition-colors"
-              >
+              <a href="#" className="hover:text-indigo-300 transition-colors">
                 Terms
               </a>
             </div>
