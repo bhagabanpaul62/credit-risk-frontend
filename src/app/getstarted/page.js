@@ -235,6 +235,110 @@ export default function GetStarted() {
     return fieldMeta.filter(field => field.step === step);
   }
 
+  // Calculate dynamic assessment data based on result and formData
+  function getAssessmentData() {
+    if (!result) return null;
+
+    const badProb = result.probability_bad || 0;
+    const goodProb = result.probability_good || 0;
+    
+    // Calculate credit score (inverse relationship with bad probability)
+    const creditScore = Math.round(900 - (badProb * 400)); // Scale from 500-900
+    
+    // Determine risk level
+    const riskLevel = badProb < 0.2 ? 'Low Risk' : badProb < 0.5 ? 'Medium Risk' : 'High Risk';
+    const riskColor = badProb < 0.2 ? 'emerald' : badProb < 0.5 ? 'amber' : 'rose';
+    
+    // Calculate score percentage for circular progress
+    const scorePercentage = Math.round((creditScore / 900) * 100);
+    
+    // Generate key factors based on form data
+    const keyFactors = [];
+    
+    // Income factor
+    if (formData.annual_income) {
+      const income = parseFloat(formData.annual_income);
+      const incomeScore = Math.min(95, Math.max(30, (income / 100000) * 80 + 20));
+      keyFactors.push({
+        label: "Annual Income Level",
+        value: Math.round(incomeScore),
+        negative: incomeScore < 50
+      });
+    }
+    
+    // Employment stability
+    if (formData.employment_years) {
+      const years = parseFloat(formData.employment_years);
+      const employmentScore = Math.min(95, years * 15 + 40);
+      keyFactors.push({
+        label: "Employment Stability",
+        value: Math.round(employmentScore),
+        negative: employmentScore < 50
+      });
+    }
+    
+    // Credit utilization
+    if (formData.balance_high_credit_pct !== "") {
+      const util = parseFloat(formData.balance_high_credit_pct) || 0;
+      const utilScore = Math.max(10, 95 - util);
+      keyFactors.push({
+        label: "Credit Utilization",
+        value: Math.round(utilScore),
+        negative: util > 50
+      });
+    }
+    
+    // Payment history
+    const delinquencies = (parseFloat(formData.delinquency_30_60_24m) || 0) + 
+                         (parseFloat(formData.delinquency_90d_24m) || 0);
+    if (delinquencies >= 0) {
+      const paymentScore = Math.max(20, 95 - (delinquencies * 20));
+      keyFactors.push({
+        label: "Payment History",
+        value: Math.round(paymentScore),
+        negative: delinquencies > 2
+      });
+    }
+    
+    // Derogatory marks
+    if (formData.derogatory_marks !== "") {
+      const derogs = parseFloat(formData.derogatory_marks) || 0;
+      const derogScore = Math.max(15, 85 - (derogs * 25));
+      keyFactors.push({
+        label: "Credit Report Issues",
+        value: Math.round(derogScore),
+        negative: derogs > 1
+      });
+    }
+
+    // Generate factor analysis data
+    const factorAnalysis = [
+      { k: "Payment History", v: keyFactors.find(f => f.label === "Payment History")?.value || 75 },
+      { k: "Credit Utilization", v: keyFactors.find(f => f.label === "Credit Utilization")?.value || 65 },
+      { k: "Income Level", v: keyFactors.find(f => f.label === "Annual Income Level")?.value || 70 },
+      { k: "Employment", v: keyFactors.find(f => f.label === "Employment Stability")?.value || 60 },
+      { k: "Account Management", v: Math.max(20, 80 - (parseFloat(formData.derogatory_marks) || 0) * 15) }
+    ].sort((a, b) => b.v - a.v);
+
+    return {
+      creditScore,
+      scorePercentage,
+      riskLevel,
+      riskColor,
+      badProbability: Math.round(badProb * 100),
+      goodProbability: Math.round(goodProb * 100),
+      keyFactors: keyFactors.slice(0, 5), // Limit to 5 factors
+      factorAnalysis,
+      riskDistribution: {
+        low: Math.round(goodProb * 100),
+        medium: Math.round((1 - goodProb - badProb) * 100),
+        high: Math.round(badProb * 100)
+      }
+    };
+  }
+
+  const assessmentData = getAssessmentData();
+
   // Decorative background blobs
   const Blobs = () => (
     <>
@@ -526,7 +630,7 @@ export default function GetStarted() {
                     >
                       <span className="text-zinc-500">{field.label}</span>
                       <span className="font-medium text-zinc-900">
-                        {formData[field.key] || "—"}
+                        {formData[field.key] || "–"}
                       </span>
                     </div>
                   ))}
@@ -558,223 +662,224 @@ export default function GetStarted() {
         </div>
       </section>
 
-      {/* Assessment Section - Original content preserved */}
-      <section className="mx-auto max-w-6xl w-full px-4 pb-12 space-y-6 relative z-10">
-        <h2 className="text-center text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow mb-2">
-          Your Credit Risk Assessment
-        </h2>
-        <div className="grid md:grid-cols-2 gap-6">
-          {/* Score */}
-          <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
-            <h4 className="text-base font-semibold mb-4 text-indigo-700">
-              Credit Score
-            </h4>
-            <div className="flex items-center gap-6">
-              <div className="relative size-32">
-                <svg viewBox="0 0 36 36" className="size-32">
-                  <path
-                    d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32"
-                    fill="#F3F4F6"
-                  />
-                  <path
-                    d="M18 2 a 16 16 0 1 1 0 32"
-                    fill="none"
-                    stroke="#22c55e"
-                    strokeWidth="4"
-                    strokeDasharray="75 100"
-                    strokeLinecap="round"
-                  />
-                </svg>
-                <div className="absolute inset-0 grid place-items-center">
-                  <div className="text-center">
-                    <div className="text-3xl font-bold text-emerald-600">780</div>
-                    <div className="text-xs text-zinc-500">out of 900</div>
+      {/* Dynamic Assessment Section - Only show when result is available */}
+      {assessmentData && (
+        <section className="mx-auto max-w-6xl w-full px-4 pb-12 space-y-6 relative z-10">
+          <h2 className="text-center text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow mb-2">
+            Your Credit Risk Assessment
+          </h2>
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Dynamic Credit Score */}
+            <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
+              <h4 className="text-base font-semibold mb-4 text-indigo-700">
+                Credit Score
+              </h4>
+              <div className="flex items-center gap-6">
+                <div className="relative size-32">
+                  <svg viewBox="0 0 36 36" className="size-32">
+                    <path
+                      d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32"
+                      fill="#F3F4F6"
+                    />
+                    <path
+                      d="M18 2 a 16 16 0 1 1 0 32"
+                      fill="none"
+                      stroke={`${assessmentData.riskColor === 'emerald' ? '#22c55e' : 
+                              assessmentData.riskColor === 'amber' ? '#f59e0b' : '#ef4444'}`}
+                      strokeWidth="4"
+                      strokeDasharray={`${assessmentData.scorePercentage} 100`}
+                      strokeLinecap="round"
+                    />
+                  </svg>
+                  <div className="absolute inset-0 grid place-items-center">
+                    <div className="text-center">
+                      <div className={`text-3xl font-bold text-${assessmentData.riskColor}-600`}>
+                        {assessmentData.creditScore}
+                      </div>
+                      <div className="text-xs text-zinc-500">out of 900</div>
+                    </div>
                   </div>
                 </div>
-              </div>
-              <div className="text-xs text-zinc-600">
-                <div className="flex items-center gap-2 mb-2">
-                  {["#ef4444", "#f59e0b", "#22c55e", "#16a34a"].map((c, i) => (
-                    <div
-                      key={i}
-                      className="h-2 w-8 rounded"
-                      style={{ backgroundColor: c }}
-                    />
-                  ))}
-                </div>
-                <div className="rounded bg-emerald-50 text-emerald-700 px-2 py-1 inline-block font-semibold">
-                  Low Risk
-                </div>
-                <div className="text-[11px] text-zinc-500 mt-1">
-                  Probability of default: 3%
-                </div>
-              </div>
-            </div>
-          </div>
-
-          {/* Key Factors */}
-          <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
-            <h4 className="text-base font-semibold mb-4 text-indigo-700">
-              Key Factors
-            </h4>
-            <ul className="space-y-3 text-sm">
-              {[
-                {
-                  label: "Consistent Income Pattern",
-                  value: 92,
-                },
-                {
-                  label: "Good Payment History",
-                  value: 88,
-                },
-                {
-                  label: "Healthy Bank Balance",
-                  value: 75,
-                },
-                {
-                  label: "Digital Payment Activity",
-                  value: 82,
-                },
-                {
-                  label: "Loan Amount to Income Ratio",
-                  value: 35,
-                  negative: true,
-                },
-              ].map((f) => (
-                <li key={f.label} className="flex items-center gap-3">
-                  <span
-                    className={`size-6 grid place-items-center rounded-full ${
-                      f.negative
-                        ? "bg-rose-50 text-rose-600"
-                        : "bg-emerald-50 text-emerald-600"
-                    }`}
-                  >
-                    ✓
-                  </span>
-                  <div className="flex-1">
-                    <div className="flex items-center justify-between text-xs">
-                      <span className="text-zinc-700">{f.label}</span>
-                      <span
-                        className={`font-semibold ${
-                          f.negative ? "text-rose-600" : "text-emerald-600"
-                        }`}
-                      >
-                        {f.value}%
-                      </span>
-                    </div>
-                    <div className="h-2 rounded bg-zinc-100 mt-1">
+                <div className="text-xs text-zinc-600">
+                  <div className="flex items-center gap-2 mb-2">
+                    {["#ef4444", "#f59e0b", "#22c55e", "#16a34a"].map((c, i) => (
                       <div
-                        className={`h-2 rounded ${
-                          f.negative ? "bg-rose-400" : "bg-emerald-500"
-                        }`}
-                        style={{ width: `${f.value}%` }}
+                        key={i}
+                        className="h-2 w-8 rounded"
+                        style={{ backgroundColor: c }}
                       />
-                    </div>
+                    ))}
                   </div>
-                </li>
-              ))}
-            </ul>
-          </div>
-        </div>
-
-        {/* Charts (simple mock) */}
-        <div className="grid md:grid-cols-2 gap-6">
-          <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
-            <h4 className="text-base font-semibold mb-4 text-indigo-700">
-              Factor Analysis
-            </h4>
-            <div className="space-y-3">
-              {[
-                {
-                  k: "Income",
-                  v: 34,
-                },
-                {
-                  k: "Payment History",
-                  v: 28,
-                },
-                {
-                  k: "Bank Balance",
-                  v: 22,
-                },
-                {
-                  k: "Digital Activity",
-                  v: 16,
-                },
-                {
-                  k: "Credit Score",
-                  v: 12,
-                },
-              ].map((b) => (
-                <div key={b.k} className="text-xs">
-                  <div className="flex items-center justify-between mb-1">
-                    <span>{b.k}</span>
-                    <span className="text-zinc-500">{b.v}</span>
+                  <div className={`rounded bg-${assessmentData.riskColor}-50 text-${assessmentData.riskColor}-700 px-2 py-1 inline-block font-semibold`}>
+                    {assessmentData.riskLevel}
                   </div>
-                  <div className="h-2 rounded bg-zinc-100">
-                    <div
-                      className="h-2 rounded bg-indigo-500"
-                      style={{ width: `${(b.v / 34) * 100}%` }}
-                    />
+                  <div className="text-[11px] text-zinc-500 mt-1">
+                    Probability of default: {assessmentData.badProbability}%
                   </div>
                 </div>
-              ))}
-            </div>
-          </div>
-          <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
-            <h4 className="text-base font-semibold mb-4 text-indigo-700">
-              Risk Category Distribution
-            </h4>
-            <div className="flex items-center gap-6">
-              <div className="relative size-32">
-                <svg
-                  viewBox="0 0 36 36"
-                  className="size-32 rotate-90 -scale-x-100"
-                >
-                  <circle cx="18" cy="18" r="16" fill="#F3F4F6" />
-                  <path
-                    d="M18 2 a 16 16 0 0 1 0 32"
-                    fill="none"
-                    stroke="#22c55e"
-                    strokeWidth="4"
-                    strokeDasharray="60 100"
-                  />
-                  <path
-                    d="M18 2 a 16 16 0 0 1 0 32"
-                    fill="none"
-                    stroke="#f59e0b"
-                    strokeWidth="4"
-                    strokeDasharray="25 100"
-                    strokeDashoffset="60"
-                  />
-                  <path
-                    d="M18 2 a 16 16 0 0 1 0 32"
-                    fill="none"
-                    stroke="#ef4444"
-                    strokeWidth="4"
-                    strokeDasharray="15 100"
-                    strokeDashoffset="85"
-                  />
-                </svg>
               </div>
-              <ul className="text-xs space-y-1">
-                <li>
-                  <span className="inline-block size-2 rounded-full bg-emerald-500 mr-2" />
-                  Low Risk: 75%
-                </li>
-                <li>
-                  <span className="inline-block size-2 rounded-full bg-amber-500 mr-2" />
-                  Medium Risk: 20%
-                </li>
-                <li>
-                  <span className="inline-block size-2 rounded-full bg-rose-500 mr-2" />
-                  High Risk: 5%
-                </li>
+            </div>
+
+            {/* Dynamic Key Factors */}
+            <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
+              <h4 className="text-base font-semibold mb-4 text-indigo-700">
+                Key Factors
+              </h4>
+              <ul className="space-y-3 text-sm">
+                {assessmentData.keyFactors.map((factor, index) => (
+                  <li key={index} className="flex items-center gap-3">
+                    <span
+                      className={`size-6 grid place-items-center rounded-full ${
+                        factor.negative
+                          ? "bg-rose-50 text-rose-600"
+                          : "bg-emerald-50 text-emerald-600"
+                      }`}
+                    >
+                      ✓
+                    </span>
+                    <div className="flex-1">
+                      <div className="flex items-center justify-between text-xs">
+                        <span className="text-zinc-700">{factor.label}</span>
+                        <span
+                          className={`font-semibold ${
+                            factor.negative ? "text-rose-600" : "text-emerald-600"
+                          }`}
+                        >
+                          {factor.value}%
+                        </span>
+                      </div>
+                      <div className="h-2 rounded bg-zinc-100 mt-1">
+                        <div
+                          className={`h-2 rounded ${
+                            factor.negative ? "bg-rose-400" : "bg-emerald-500"
+                          }`}
+                          style={{ width: `${factor.value}%` }}
+                        />
+                      </div>
+                    </div>
+                  </li>
+                ))}
               </ul>
             </div>
           </div>
-        </div>
-      </section>
+
+          {/* Dynamic Charts */}
+          <div className="grid md:grid-cols-2 gap-6">
+            {/* Dynamic Factor Analysis */}
+            <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
+              <h4 className="text-base font-semibold mb-4 text-indigo-700">
+                Factor Analysis
+              </h4>
+              <div className="space-y-3">
+                {assessmentData.factorAnalysis.map((factor) => (
+                  <div key={factor.k} className="text-xs">
+                    <div className="flex items-center justify-between mb-1">
+                      <span>{factor.k}</span>
+                      <span className="text-zinc-500">{Math.round(factor.v)}</span>
+                    </div>
+                    <div className="h-2 rounded bg-zinc-100">
+                      <div
+                        className="h-2 rounded bg-indigo-500"
+                        style={{ width: `${Math.min(100, (factor.v / Math.max(...assessmentData.factorAnalysis.map(f => f.v))) * 100)}%` }}
+                      />
+                    </div>
+                  </div>
+                ))}
+              </div>
+            </div>
+
+            {/* Dynamic Risk Distribution */}
+            <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
+              <h4 className="text-base font-semibold mb-4 text-indigo-700">
+                Risk Category Distribution
+              </h4>
+              <div className="flex items-center gap-6">
+                <div className="relative size-32">
+                  <svg
+                    viewBox="0 0 36 36"
+                    className="size-32 rotate-90 -scale-x-100"
+                  >
+                    <circle cx="18" cy="18" r="16" fill="#F3F4F6" />
+                    <path
+                      d="M18 2 a 16 16 0 0 1 0 32"
+                      fill="none"
+                      stroke="#22c55e"
+                      strokeWidth="4"
+                      strokeDasharray={`${assessmentData.riskDistribution.low} 100`}
+                    />
+                    <path
+                      d="M18 2 a 16 16 0 0 1 0 32"
+                      fill="none"
+                      stroke="#f59e0b"
+                      strokeWidth="4"
+                      strokeDasharray={`${assessmentData.riskDistribution.medium} 100`}
+                      strokeDashoffset={-assessmentData.riskDistribution.low}
+                    />
+                    <path
+                      d="M18 2 a 16 16 0 0 1 0 32"
+                      fill="none"
+                      stroke="#ef4444"
+                      strokeWidth="4"
+                      strokeDasharray={`${assessmentData.riskDistribution.high} 100`}
+                      strokeDashoffset={-(assessmentData.riskDistribution.low + assessmentData.riskDistribution.medium)}
+                    />
+                  </svg>
+                </div>
+                <ul className="text-xs space-y-1">
+                  <li>
+                    <span className="inline-block size-2 rounded-full bg-emerald-500 mr-2" />
+                    Low Risk: {assessmentData.riskDistribution.low}%
+                  </li>
+                  <li>
+                    <span className="inline-block size-2 rounded-full bg-amber-500 mr-2" />
+                    Medium Risk: {assessmentData.riskDistribution.medium}%
+                  </li>
+                  <li>
+                    <span className="inline-block size-2 rounded-full bg-rose-500 mr-2" />
+                    High Risk: {assessmentData.riskDistribution.high}%
+                  </li>
+                </ul>
+              </div>
+            </div>
+          </div>
+
+          {/* Additional Insights */}
+          <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
+            <h4 className="text-base font-semibold mb-4 text-indigo-700">
+              Assessment Summary
+            </h4>
+            <div className="grid md:grid-cols-3 gap-6 text-sm">
+              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50">
+                <div className="text-2xl font-bold text-indigo-600 mb-1">
+                  {result.prediction}
+                </div>
+                <div className="text-xs text-indigo-500">Model Prediction</div>
+              </div>
+              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-purple-50 to-violet-50">
+                <div className="text-2xl font-bold text-violet-600 mb-1">
+                  {result.model_version}
+                </div>
+                <div className="text-xs text-violet-500">Model Version</div>
+              </div>
+              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50">
+                <div className="text-2xl font-bold text-emerald-600 mb-1">
+                  {result.threshold_used}
+                </div>
+                <div className="text-xs text-emerald-500">Decision Threshold</div>
+              </div>
+            </div>
+            <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-slate-50 to-gray-50 border-l-4 border-indigo-500">
+              <p className="text-sm text-slate-600">
+                <strong className="text-indigo-700">Assessment Complete:</strong> Your credit risk analysis is based on {fieldMeta.filter(f => formData[f.key] !== "").length} data points. 
+                The model shows a {assessmentData.badProbability}% probability of default risk. 
+                {assessmentData.badProbability < 20 ? " This indicates strong creditworthiness." : 
+                 assessmentData.badProbability < 50 ? " This suggests moderate credit risk that may require additional review." : 
+                 " This indicates higher risk that may impact credit decisions."}
+              </p>
+            </div>
+          </div>
+        </section>
+      )}
 
       {/* Footer */}
       <footer className="mt-auto border-t bg-zinc-950 text-zinc-300 relative z-10">
