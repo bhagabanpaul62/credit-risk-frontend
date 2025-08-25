@@ -11,6 +11,8 @@ import {
   FaMoneyBill,
   FaChartLine,
   FaClipboardCheck,
+  FaBars, // Hamburger icon
+  FaTimes, // Close icon
 } from "react-icons/fa";
 
 // Field metadata for the credit risk model
@@ -156,6 +158,7 @@ const fieldMeta = [
     step: 3,
   },
 ];
+
 
 export default function GetStarted() {
   const [currentStep, setCurrentStep] = useState(1);
@@ -376,599 +379,610 @@ export default function GetStarted() {
   );
 
   return (
+    // The main container is a flex column, ensuring the footer stays at the bottom.
+    // overflow-x-hidden prevents accidental horizontal scrolling.
     <div className="min-h-screen flex flex-col bg-gradient-to-br from-indigo-50 via-white to-violet-100 text-slate-800 relative overflow-x-hidden text-sm sm:text-base">
       <Blobs />
 
       {/* Hero */}
-      <section
-        id="home"
-        className="w-full border-b bg-gradient-to-b from-white via-violet-50 to-white relative z-10"
-      >
-        <div className="mx-auto max-w-6xl px-2 sm:px-4 py-8 sm:py-12 md:py-16 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
-          <div className="space-y-4 sm:space-y-6">
-            <h1 className="text-2xl sm:text-3xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow">
-              Check your credit score instantly.
-            </h1>
-            <p className="text-sm sm:text-base md:text-lg text-slate-600 max-w-md">
-              Our advanced AI analyzes your financial data to provide accurate
-              credit risk assessment in minutes.
-            </p>
-            <div>
-              <Link
-                href="#wizard"
-                className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-500 px-4 sm:px-6 py-2 sm:py-3 text-sm sm:text-base font-semibold text-white shadow-lg hover:scale-105 hover:from-indigo-700 hover:to-violet-600 transition-all duration-200"
-              >
-                Get Started <FaArrowRight />
-              </Link>
-            </div>
-          </div>
-          <div className="flex justify-center mt-6 md:mt-0">
-            <div className="relative w-full max-w-xs sm:max-w-md aspect-[4/3] drop-shadow-xl">
-              <Image
-                src="/window.svg"
-                alt="Hero"
-                fill
-                className="object-contain"
-                priority
-              />
-            </div>
-          </div>
-        </div>
-      </section>
-
-      {/* Wizard Section */}
-      <section
-        id="wizard"
-        className="relative z-10 mx-auto max-w-6xl w-full px-2 sm:px-4 py-8 sm:py-12 space-y-6"
-      >
-        <h2 className="text-center text-xl sm:text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow mb-2">
-          Predict Your Credit Risk
-        </h2>
-        {/* Stepper */}
-        <div className="flex items-center justify-center gap-6 text-xs text-slate-500 mb-4">
-          {steps.map((label, idx) => (
-            <div
-              key={label}
-              className="flex items-center gap-2 transition-all duration-300"
-            >
-              <div
-                className={`size-8 grid place-items-center rounded-full border-2 shadow-md transition-all duration-300
-                  ${
-                    currentStep === idx + 1
-                      ? "bg-gradient-to-br from-indigo-600 to-violet-500 text-white border-indigo-600 scale-110"
-                      : "bg-white text-slate-600 border-slate-200"
-                  }`}
-              >
-                {idx === 0 && <FaUser />}
-                {idx === 1 && <FaMoneyBill />}
-                {idx === 2 && <FaChartLine />}
-                {idx === 3 && <FaClipboardCheck />}
+      {/* The main content sections now have a lower z-index (z-10) than the navbar (z-50) */}
+      <main className="flex-grow">
+        <section
+          id="home"
+          className="w-full bg-gradient-to-b from-white via-violet-50 to-white relative z-10"
+        >
+          {/* Responsive padding and layout adjustments */}
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 py-12 sm:py-16 md:py-20 grid grid-cols-1 md:grid-cols-2 gap-8 items-center">
+            <div className="space-y-4 sm:space-y-6 text-center md:text-left">
+              <h1 className="text-3xl sm:text-4xl md:text-5xl font-extrabold tracking-tight text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow">
+                Check your credit score instantly.
+              </h1>
+              <p className="text-base md:text-lg text-slate-600 max-w-md mx-auto md:mx-0">
+                Our advanced AI analyzes your financial data to provide accurate
+                credit risk assessment in minutes.
+              </p>
+              <div>
+                <Link
+                  href="#wizard"
+                  className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-500 px-5 sm:px-6 py-2.5 sm:py-3 text-base font-semibold text-white shadow-lg hover:scale-105 hover:from-indigo-700 hover:to-violet-600 transition-all duration-200"
+                >
+                  Get Started <FaArrowRight />
+                </Link>
               </div>
-              <span
-                className={`hidden sm:block font-semibold transition-colors duration-300 ${
-                  currentStep === idx + 1 ? "text-indigo-700" : ""
-                }`}
-              >
-                {label}
-              </span>
             </div>
-          ))}
-        </div>
+            <div className="flex justify-center mt-6 md:mt-0">
+              <div className="relative w-full max-w-xs sm:max-w-sm md:max-w-md aspect-[4/3] drop-shadow-xl">
+                <Image
+                  src="/window.svg"
+                  alt="Hero"
+                  fill
+                  className="object-contain"
+                  priority
+                />
+              </div>
+            </div>
+          </div>
+        </section>
 
-        {/* Card */}
-        <div className="rounded-2xl border shadow-xl p-4 sm:p-6 md:p-10 bg-white/70 backdrop-blur-lg transition-all duration-500 ring-1 ring-indigo-100">
-          {currentStep === 1 && (
-            <>
-              <h3 className="text-lg font-semibold mb-4 text-indigo-700 flex items-center gap-2">
-                <FaUser className="text-indigo-500" /> Step 1: Basic Information
-              </h3>
-              <form
-                className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                onSubmit={handleSubmit}
+        {/* Wizard Section */}
+        <section
+          id="wizard"
+          className="relative z-10 mx-auto max-w-6xl w-full px-4 sm:px-6 py-12 sm:py-16 space-y-8"
+        >
+          <h2 className="text-center text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow mb-2">
+            Predict Your Credit Risk
+          </h2>
+          {/* Stepper */}
+          {/* RESPONSIVE CHANGE: Adjusted gap and flex direction for smaller screens */}
+          <div className="flex items-center justify-center gap-2 sm:gap-4 md:gap-6 text-xs text-slate-500 mb-4">
+            {steps.map((label, idx) => (
+              <div
+                key={label}
+                className="flex flex-col sm:flex-row items-center gap-2 transition-all duration-300"
               >
-                {getFieldsForStep(1).map((field) => (
-                  <div
-                    key={field.key}
-                    className={field.key === "age" ? "md:col-span-2" : ""}
-                  >
-                    <label className="block text-xs mb-1 font-medium text-slate-700">
-                      {field.label}
-                    </label>
-                    <input
-                      type="number"
-                      value={formData[field.key]}
-                      onChange={(e) => updateField(field.key, e.target.value)}
-                      className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
-                      placeholder={field.label}
-                    />
-                    <span className="text-xs text-slate-500 mt-1 block">
-                      {field.help}
-                    </span>
-                  </div>
-                ))}
-                <div className="md:col-span-2 flex justify-end">
-                  <button
-                    type="button"
-                    onClick={nextStep}
-                    className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-500 px-6 py-2 text-base font-semibold text-white shadow-lg hover:scale-105 hover:from-indigo-700 hover:to-violet-600 transition-all duration-200"
-                  >
-                    Next Step <FaArrowRight />
-                  </button>
+                <div
+                  className={`size-8 grid place-items-center rounded-full border-2 shadow-md transition-all duration-300
+                    ${
+                      currentStep === idx + 1
+                        ? "bg-gradient-to-br from-indigo-600 to-violet-500 text-white border-indigo-600 scale-110"
+                        : "bg-white text-slate-600 border-slate-200"
+                    }`}
+                >
+                  {idx === 0 && <FaUser />}
+                  {idx === 1 && <FaMoneyBill />}
+                  {idx === 2 && <FaChartLine />}
+                  {idx === 3 && <FaClipboardCheck />}
                 </div>
-              </form>
-            </>
-          )}
+                <span
+                  className={`font-semibold transition-colors duration-300 text-center sm:text-left ${
+                    currentStep === idx + 1 ? "text-indigo-700" : ""
+                  }`}
+                >
+                  {label}
+                </span>
+              </div>
+            ))}
+          </div>
 
-          {currentStep === 2 && (
-            <>
-              <h3 className="text-lg font-semibold mb-4 text-indigo-700 flex items-center gap-2">
-                <FaMoneyBill className="text-green-500" /> Step 2: Financial
-                Information
-              </h3>
-              <form
-                className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                onSubmit={handleSubmit}
-              >
-                {getFieldsForStep(2).map((field) => (
-                  <div key={field.key}>
-                    <label className="block text-xs mb-1 font-medium text-slate-700">
-                      {field.label}
-                    </label>
-                    <input
-                      type="number"
-                      value={formData[field.key]}
-                      onChange={(e) => updateField(field.key, e.target.value)}
-                      className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
-                      placeholder={field.label}
-                    />
-                    <span className="text-xs text-slate-500 mt-1 block">
-                      {field.help}
-                    </span>
-                  </div>
-                ))}
-                <div className="md:col-span-2 flex justify-between">
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    className="inline-flex items-center gap-2 rounded-lg border px-6 py-2 text-base font-semibold text-slate-700 hover:bg-slate-50 transition-all duration-200"
-                  >
-                    <FaArrowLeft /> Back
-                  </button>
-                  <button
-                    type="button"
-                    onClick={nextStep}
-                    className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-500 px-6 py-2 text-base font-semibold text-white shadow-lg hover:scale-105 hover:from-indigo-700 hover:to-violet-600 transition-all duration-200"
-                  >
-                    Next Step <FaArrowRight />
-                  </button>
-                </div>
-              </form>
-            </>
-          )}
-
-          {currentStep === 3 && (
-            <>
-              <h3 className="text-lg font-semibold mb-4 text-indigo-700 flex items-center gap-2">
-                <FaChartLine className="text-violet-500" /> Step 3: Credit
-                History
-              </h3>
-              <form
-                className="grid grid-cols-1 md:grid-cols-2 gap-6"
-                onSubmit={handleSubmit}
-              >
-                {getFieldsForStep(3).map((field) => (
-                  <div key={field.key}>
-                    <label className="block text-xs mb-1 font-medium text-slate-700">
-                      {field.label}
-                    </label>
-                    {field.type === "boolean" ? (
-                      <select
-                        value={formData[field.key]}
-                        onChange={(e) => updateField(field.key, e.target.value)}
-                        className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
-                      >
-                        <option value="">Select</option>
-                        <option value="yes">Yes</option>
-                        <option value="no">No</option>
-                      </select>
-                    ) : (
+          {/* Card */}
+          <div className="rounded-2xl border shadow-xl p-4 sm:p-6 md:p-10 bg-white/70 backdrop-blur-lg transition-all duration-500 ring-1 ring-indigo-100">
+            {currentStep === 1 && (
+              <>
+                <h3 className="text-lg font-semibold mb-4 text-indigo-700 flex items-center gap-2">
+                  <FaUser className="text-indigo-500" /> Step 1: Basic Information
+                </h3>
+                <form
+                  className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                  onSubmit={handleSubmit}
+                >
+                  {getFieldsForStep(1).map((field) => (
+                    <div
+                      key={field.key}
+                      className={field.key === "age" ? "md:col-span-2" : ""}
+                    >
+                      <label className="block text-sm mb-1 font-medium text-slate-700">
+                        {field.label}
+                      </label>
                       <input
                         type="number"
                         value={formData[field.key]}
                         onChange={(e) => updateField(field.key, e.target.value)}
-                        className="w-full rounded-lg border px-3 py-2 text-sm focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
+                        className="w-full rounded-lg border px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
                         placeholder={field.label}
                       />
-                    )}
-                    <span className="text-xs text-slate-500 mt-1 block">
-                      {field.help}
-                    </span>
-                  </div>
-                ))}
-                <div className="md:col-span-2 flex justify-between">
-                  <button
-                    type="button"
-                    onClick={prevStep}
-                    className="inline-flex items-center gap-2 rounded-lg border px-6 py-2 text-base font-semibold text-slate-700 hover:bg-slate-50 transition-all duration-200"
-                  >
-                    <FaArrowLeft /> Back
-                  </button>
-                  <button
-                    type="button"
-                    onClick={nextStep}
-                    className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-500 px-6 py-2 text-base font-semibold text-white shadow-lg hover:scale-105 hover:from-indigo-700 hover:to-violet-600 transition-all duration-200"
-                  >
-                    Review <FaArrowRight />
-                  </button>
-                </div>
-              </form>
-            </>
-          )}
-
-          {currentStep === 4 && (
-            <>
-              <h3 className="text-lg font-semibold mb-4 text-indigo-700 flex items-center gap-2">
-                <FaClipboardCheck className="text-violet-500" /> Step 4: Review
-                & Submit
-              </h3>
-
-              {/* Show error if any */}
-              {error && (
-                <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
-                  <p className="text-red-700 font-medium">Error: {error}</p>
-                </div>
-              )}
-
-              {/* Show results if available */}
-              {result && (
-                <div className="mb-6 p-6 bg-green-50 border border-green-200 rounded-lg">
-                  <h4 className="text-lg font-semibold text-green-800 mb-4">
-                    Prediction Result
-                  </h4>
-                  <div className="grid grid-cols-1 md:grid-cols-2 gap-4 text-sm">
-                    <div className="flex justify-between">
-                      <span className="text-green-600">Status:</span>
-                      <span className="font-semibold">{result.status}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-green-600">Prediction:</span>
-                      <span className="font-semibold">{result.prediction}</span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-green-600">
-                        Bad Risk Probability:
-                      </span>
-                      <span className="font-semibold">
-                        {(result.probability_bad * 100).toFixed(2)}%
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-green-600">
-                        Good Risk Probability:
-                      </span>
-                      <span className="font-semibold">
-                        {(result.probability_good * 100).toFixed(2)}%
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-green-600">Threshold:</span>
-                      <span className="font-semibold">
-                        {result.threshold_used}
-                      </span>
-                    </div>
-                    <div className="flex justify-between">
-                      <span className="text-green-600">Model Version:</span>
-                      <span className="font-semibold">
-                        {result.model_version}
-                      </span>
-                    </div>
-                  </div>
-                </div>
-              )}
-
-              {!result && (
-                <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-sm mb-6">
-                  {fieldMeta.map((field) => (
-                    <div
-                      key={field.key}
-                      className="flex items-center justify-between rounded border px-3 py-2 bg-white/80"
-                    >
-                      <span className="text-zinc-500">{field.label}</span>
-                      <span className="font-medium text-zinc-900">
-                        {formData[field.key] || "–"}
+                      <span className="text-xs text-slate-500 mt-1 block">
+                        {field.help}
                       </span>
                     </div>
                   ))}
-                </div>
-              )}
-
-              <div className="flex justify-between">
-                <button
-                  type="button"
-                  onClick={prevStep}
-                  disabled={loading}
-                  className="inline-flex items-center gap-2 rounded-lg border px-6 py-2 text-base font-semibold text-slate-700 hover:bg-slate-50 transition-all duration-200 disabled:opacity-50"
-                >
-                  <FaArrowLeft /> Back
-                </button>
-                {!result && (
-                  <button
-                    type="button"
-                    onClick={handleSubmit}
-                    disabled={loading}
-                    className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-2 text-base font-semibold text-white shadow-lg hover:scale-105 hover:from-green-600 hover:to-emerald-700 transition-all duration-200 disabled:opacity-50"
-                  >
-                    <FaCheckCircle /> {loading ? "Submitting..." : "Submit"}
-                  </button>
-                )}
-              </div>
-            </>
-          )}
-        </div>
-      </section>
-
-      {/* Dynamic Assessment Section - Only show when result is available */}
-      {assessmentData && (
-        <section className="mx-auto max-w-6xl w-full px-2 sm:px-4 pb-8 sm:pb-12 space-y-6 relative z-10">
-          <h2 className="text-center text-xl sm:text-2xl md:text-3xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow mb-2">
-            Your Credit Risk Assessment
-          </h2>
-          <div className="grid grid-cols-1 md:grid-cols-2 gap-4 sm:gap-6">
-            {/* Dynamic Credit Score */}
-            <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
-              <h4 className="text-base font-semibold mb-4 text-indigo-700">
-                Credit Score
-              </h4>
-              <div className="flex items-center gap-6">
-                <div className="relative size-32">
-                  <svg viewBox="0 0 36 36" className="size-32">
-                    <path
-                      d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32"
-                      fill="#F3F4F6"
-                    />
-                    <path
-                      d="M18 2 a 16 16 0 1 1 0 32"
-                      fill="none"
-                      stroke={`${
-                        assessmentData.riskColor === "emerald"
-                          ? "#22c55e"
-                          : assessmentData.riskColor === "amber"
-                          ? "#f59e0b"
-                          : "#ef4444"
-                      }`}
-                      strokeWidth="4"
-                      strokeDasharray={`${assessmentData.scorePercentage} 100`}
-                      strokeLinecap="round"
-                    />
-                  </svg>
-                  <div className="absolute inset-0 grid place-items-center">
-                    <div className="text-center">
-                      <div
-                        className={`text-3xl font-bold text-${assessmentData.riskColor}-600`}
-                      >
-                        {assessmentData.creditScore}
-                      </div>
-                      <div className="text-xs text-zinc-500">out of 900</div>
-                    </div>
-                  </div>
-                </div>
-                <div className="text-xs text-zinc-600">
-                  <div className="flex items-center gap-2 mb-2">
-                    {["#ef4444", "#f59e0b", "#22c55e", "#16a34a"].map(
-                      (c, i) => (
-                        <div
-                          key={i}
-                          className="h-2 w-8 rounded"
-                          style={{ backgroundColor: c }}
-                        />
-                      )
-                    )}
-                  </div>
-                  <div
-                    className={`rounded bg-${assessmentData.riskColor}-50 text-${assessmentData.riskColor}-700 px-2 py-1 inline-block font-semibold`}
-                  >
-                    {assessmentData.riskLevel}
-                  </div>
-                  <div className="text-[11px] text-zinc-500 mt-1">
-                    Probability of default: {assessmentData.badProbability}%
-                  </div>
-                </div>
-              </div>
-            </div>
-
-            {/* Dynamic Key Factors */}
-            <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
-              <h4 className="text-base font-semibold mb-4 text-indigo-700">
-                Key Factors
-              </h4>
-              <ul className="space-y-3 text-sm">
-                {assessmentData.keyFactors.map((factor, index) => (
-                  <li key={index} className="flex items-center gap-3">
-                    <span
-                      className={`size-6 grid place-items-center rounded-full ${
-                        factor.negative
-                          ? "bg-rose-50 text-rose-600"
-                          : "bg-emerald-50 text-emerald-600"
-                      }`}
+                  <div className="md:col-span-2 flex justify-end">
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="inline-flex items-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-500 px-6 py-2 text-base font-semibold text-white shadow-lg hover:scale-105 hover:from-indigo-700 hover:to-violet-600 transition-all duration-200 w-full sm:w-auto justify-center"
                     >
-                      ✓
-                    </span>
-                    <div className="flex-1">
-                      <div className="flex items-center justify-between text-xs">
-                        <span className="text-zinc-700">{factor.label}</span>
-                        <span
-                          className={`font-semibold ${
-                            factor.negative
-                              ? "text-rose-600"
-                              : "text-emerald-600"
-                          }`}
-                        >
-                          {factor.value}%
-                        </span>
-                      </div>
-                      <div className="h-2 rounded bg-zinc-100 mt-1">
-                        <div
-                          className={`h-2 rounded ${
-                            factor.negative ? "bg-rose-400" : "bg-emerald-500"
-                          }`}
-                          style={{ width: `${factor.value}%` }}
-                        />
-                      </div>
-                    </div>
-                  </li>
-                ))}
-              </ul>
-            </div>
-          </div>
+                      Next Step <FaArrowRight />
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
 
-          {/* Dynamic Charts */}
-          <div className="grid md:grid-cols-2 gap-6">
-            {/* Dynamic Factor Analysis */}
-            <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
-              <h4 className="text-base font-semibold mb-4 text-indigo-700">
-                Factor Analysis
-              </h4>
-              <div className="space-y-3">
-                {assessmentData.factorAnalysis.map((factor) => (
-                  <div key={factor.k} className="text-xs">
-                    <div className="flex items-center justify-between mb-1">
-                      <span>{factor.k}</span>
-                      <span className="text-zinc-500">
-                        {Math.round(factor.v)}
+            {currentStep === 2 && (
+              <>
+                <h3 className="text-lg font-semibold mb-4 text-indigo-700 flex items-center gap-2">
+                  <FaMoneyBill className="text-green-500" /> Step 2: Financial
+                  Information
+                </h3>
+                <form
+                  className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                  onSubmit={handleSubmit}
+                >
+                  {getFieldsForStep(2).map((field) => (
+                    <div key={field.key}>
+                      <label className="block text-sm mb-1 font-medium text-slate-700">
+                        {field.label}
+                      </label>
+                      <input
+                        type="number"
+                        value={formData[field.key]}
+                        onChange={(e) => updateField(field.key, e.target.value)}
+                        className="w-full rounded-lg border px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
+                        placeholder={field.label}
+                      />
+                      <span className="text-xs text-slate-500 mt-1 block">
+                        {field.help}
                       </span>
                     </div>
-                    <div className="h-2 rounded bg-zinc-100">
-                      <div
-                        className="h-2 rounded bg-indigo-500"
-                        style={{
-                          width: `${Math.min(
-                            100,
-                            (factor.v /
-                              Math.max(
-                                ...assessmentData.factorAnalysis.map((f) => f.v)
-                              )) *
-                              100
-                          )}%`,
-                        }}
-                      />
+                  ))}
+                  <div className="md:col-span-2 flex flex-col sm:flex-row justify-between gap-4">
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border px-6 py-2 text-base font-semibold text-slate-700 hover:bg-slate-50 transition-all duration-200"
+                    >
+                      <FaArrowLeft /> Back
+                    </button>
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-500 px-6 py-2 text-base font-semibold text-white shadow-lg hover:scale-105 hover:from-indigo-700 hover:to-violet-600 transition-all duration-200"
+                    >
+                      Next Step <FaArrowRight />
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {currentStep === 3 && (
+              <>
+                <h3 className="text-lg font-semibold mb-4 text-indigo-700 flex items-center gap-2">
+                  <FaChartLine className="text-violet-500" /> Step 3: Credit
+                  History
+                </h3>
+                <form
+                  className="grid grid-cols-1 md:grid-cols-2 gap-6"
+                  onSubmit={handleSubmit}
+                >
+                  {getFieldsForStep(3).map((field) => (
+                    <div key={field.key}>
+                      <label className="block text-sm mb-1 font-medium text-slate-700">
+                        {field.label}
+                      </label>
+                      {field.type === "boolean" ? (
+                        <select
+                          value={formData[field.key]}
+                          onChange={(e) => updateField(field.key, e.target.value)}
+                          className="w-full rounded-lg border px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
+                        >
+                          <option value="">Select</option>
+                          <option value="yes">Yes</option>
+                          <option value="no">No</option>
+                        </select>
+                      ) : (
+                        <input
+                          type="number"
+                          value={formData[field.key]}
+                          onChange={(e) => updateField(field.key, e.target.value)}
+                          className="w-full rounded-lg border px-3 py-2 text-base focus:outline-none focus:ring-2 focus:ring-indigo-400 transition-all"
+                          placeholder={field.label}
+                        />
+                      )}
+                      <span className="text-xs text-slate-500 mt-1 block">
+                        {field.help}
+                      </span>
+                    </div>
+                  ))}
+                  <div className="md:col-span-2 flex flex-col sm:flex-row justify-between gap-4">
+                    <button
+                      type="button"
+                      onClick={prevStep}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg border px-6 py-2 text-base font-semibold text-slate-700 hover:bg-slate-50 transition-all duration-200"
+                    >
+                      <FaArrowLeft /> Back
+                    </button>
+                    <button
+                      type="button"
+                      onClick={nextStep}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-indigo-600 to-violet-500 px-6 py-2 text-base font-semibold text-white shadow-lg hover:scale-105 hover:from-indigo-700 hover:to-violet-600 transition-all duration-200"
+                    >
+                      Review <FaArrowRight />
+                    </button>
+                  </div>
+                </form>
+              </>
+            )}
+
+            {currentStep === 4 && (
+              <>
+                <h3 className="text-lg font-semibold mb-4 text-indigo-700 flex items-center gap-2">
+                  <FaClipboardCheck className="text-violet-500" /> Step 4: Review
+                  & Submit
+                </h3>
+
+                {/* Show error if any */}
+                {error && (
+                  <div className="mb-6 p-4 bg-red-50 border border-red-200 rounded-lg">
+                    <p className="text-red-700 font-medium">Error: {error}</p>
+                  </div>
+                )}
+
+                {/* Show results if available */}
+                {result && (
+                  <div className="mb-6 p-4 sm:p-6 bg-green-50 border border-green-200 rounded-lg">
+                    <h4 className="text-lg font-semibold text-green-800 mb-4">
+                      Prediction Result
+                    </h4>
+                    <div className="grid grid-cols-1 sm:grid-cols-2 gap-4 text-base">
+                      <div className="flex justify-between">
+                        <span className="text-green-600">Status:</span>
+                        <span className="font-semibold">{result.status}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-green-600">Prediction:</span>
+                        <span className="font-semibold">{result.prediction}</span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-green-600">
+                          Bad Risk Probability:
+                        </span>
+                        <span className="font-semibold">
+                          {(result.probability_bad * 100).toFixed(2)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-green-600">
+                          Good Risk Probability:
+                        </span>
+                        <span className="font-semibold">
+                          {(result.probability_good * 100).toFixed(2)}%
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-green-600">Threshold:</span>
+                        <span className="font-semibold">
+                          {result.threshold_used}
+                        </span>
+                      </div>
+                      <div className="flex justify-between">
+                        <span className="text-green-600">Model Version:</span>
+                        <span className="font-semibold">
+                          {result.model_version}
+                        </span>
+                      </div>
                     </div>
                   </div>
-                ))}
-              </div>
-            </div>
+                )}
 
-            {/* Dynamic Risk Distribution */}
-            <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
-              <h4 className="text-base font-semibold mb-4 text-indigo-700">
-                Risk Category Distribution
-              </h4>
-              <div className="flex items-center gap-6">
-                <div className="relative size-32">
-                  <svg
-                    viewBox="0 0 36 36"
-                    className="size-32 rotate-90 -scale-x-100"
+                {!result && (
+                  <div className="grid grid-cols-1 sm:grid-cols-2 gap-2 sm:gap-4 text-sm mb-6">
+                    {fieldMeta.map((field) => (
+                      <div
+                        key={field.key}
+                        className="flex items-center justify-between rounded border px-3 py-2 bg-white/80"
+                      >
+                        <span className="text-zinc-500">{field.label}</span>
+                        <span className="font-medium text-zinc-900 text-right">
+                          {formData[field.key] || "–"}
+                        </span>
+                      </div>
+                    ))}
+                  </div>
+                )}
+
+                <div className="flex flex-col sm:flex-row justify-between gap-4">
+                  <button
+                    type="button"
+                    onClick={prevStep}
+                    disabled={loading}
+                    className="inline-flex items-center justify-center gap-2 rounded-lg border px-6 py-2 text-base font-semibold text-slate-700 hover:bg-slate-50 transition-all duration-200 disabled:opacity-50"
                   >
-                    <circle cx="18" cy="18" r="16" fill="#F3F4F6" />
-                    <path
-                      d="M18 2 a 16 16 0 0 1 0 32"
-                      fill="none"
-                      stroke="#22c55e"
-                      strokeWidth="4"
-                      strokeDasharray={`${assessmentData.riskDistribution.low} 100`}
-                    />
-                    <path
-                      d="M18 2 a 16 16 0 0 1 0 32"
-                      fill="none"
-                      stroke="#f59e0b"
-                      strokeWidth="4"
-                      strokeDasharray={`${assessmentData.riskDistribution.medium} 100`}
-                      strokeDashoffset={-assessmentData.riskDistribution.low}
-                    />
-                    <path
-                      d="M18 2 a 16 16 0 0 1 0 32"
-                      fill="none"
-                      stroke="#ef4444"
-                      strokeWidth="4"
-                      strokeDasharray={`${assessmentData.riskDistribution.high} 100`}
-                      strokeDashoffset={
-                        -(
-                          assessmentData.riskDistribution.low +
-                          assessmentData.riskDistribution.medium
-                        )
-                      }
-                    />
-                  </svg>
+                    <FaArrowLeft /> Back
+                  </button>
+                  {!result && (
+                    <button
+                      type="button"
+                      onClick={handleSubmit}
+                      disabled={loading}
+                      className="inline-flex items-center justify-center gap-2 rounded-lg bg-gradient-to-r from-green-500 to-emerald-600 px-6 py-2 text-base font-semibold text-white shadow-lg hover:scale-105 hover:from-green-600 hover:to-emerald-700 transition-all duration-200 disabled:opacity-50"
+                    >
+                      <FaCheckCircle /> {loading ? "Submitting..." : "Submit"}
+                    </button>
+                  )}
                 </div>
-                <ul className="text-xs space-y-1">
-                  <li>
-                    <span className="inline-block size-2 rounded-full bg-emerald-500 mr-2" />
-                    Low Risk: {assessmentData.riskDistribution.low}%
-                  </li>
-                  <li>
-                    <span className="inline-block size-2 rounded-full bg-amber-500 mr-2" />
-                    Medium Risk: {assessmentData.riskDistribution.medium}%
-                  </li>
-                  <li>
-                    <span className="inline-block size-2 rounded-full bg-rose-500 mr-2" />
-                    High Risk: {assessmentData.riskDistribution.high}%
-                  </li>
+              </>
+            )}
+          </div>
+        </section>
+
+        {/* Dynamic Assessment Section - Only show when result is available */}
+        {assessmentData && (
+          <section className="mx-auto max-w-6xl w-full px-4 sm:px-6 pb-12 sm:pb-16 space-y-8 relative z-10">
+            <h2 className="text-center text-2xl sm:text-3xl md:text-4xl font-extrabold text-transparent bg-clip-text bg-gradient-to-r from-indigo-700 to-violet-600 drop-shadow mb-2">
+              Your Credit Risk Assessment
+            </h2>
+            <div className="grid grid-cols-1 lg:grid-cols-2 gap-6 sm:gap-8">
+              {/* Dynamic Credit Score */}
+              <div className="rounded-2xl border shadow-xl p-6 sm:p-8 bg-white/80 backdrop-blur-lg">
+                <h4 className="text-lg font-semibold mb-4 text-indigo-700">
+                  Credit Score
+                </h4>
+                {/* RESPONSIVE CHANGE: Stacks vertically on small screens */}
+                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6 text-center sm:text-left">
+                  {/* RESPONSIVE CHANGE: Resized SVG for smaller screens */}
+                  <div className="relative size-28 sm:size-32">
+                    <svg viewBox="0 0 36 36" className="size-28 sm:size-32">
+                      <path
+                        d="M18 2 a 16 16 0 1 1 0 32 a 16 16 0 1 1 0 -32"
+                        fill="#F3F4F6"
+                      />
+                      <path
+                        d="M18 2 a 16 16 0 1 1 0 32"
+                        fill="none"
+                        stroke={`${
+                          assessmentData.riskColor === "emerald"
+                            ? "#22c55e"
+                            : assessmentData.riskColor === "amber"
+                            ? "#f59e0b"
+                            : "#ef4444"
+                        }`}
+                        strokeWidth="4"
+                        strokeDasharray={`${assessmentData.scorePercentage} 100`}
+                        strokeLinecap="round"
+                      />
+                    </svg>
+                    <div className="absolute inset-0 grid place-items-center">
+                      <div className="text-center">
+                        <div
+                          className={`text-3xl sm:text-4xl font-bold text-${assessmentData.riskColor}-600`}
+                        >
+                          {assessmentData.creditScore}
+                        </div>
+                        <div className="text-sm text-zinc-500">out of 900</div>
+                      </div>
+                    </div>
+                  </div>
+                  <div className="text-sm text-zinc-600 space-y-2">
+                    <div className="flex items-center gap-2 mb-2 justify-center sm:justify-start">
+                      {["#ef4444", "#f59e0b", "#22c55e", "#16a34a"].map(
+                        (c, i) => (
+                          <div
+                            key={i}
+                            className="h-2 w-8 rounded"
+                            style={{ backgroundColor: c }}
+                          />
+                        )
+                      )}
+                    </div>
+                    <div
+                      className={`rounded bg-${assessmentData.riskColor}-50 text-${assessmentData.riskColor}-700 px-2 py-1 inline-block font-semibold`}
+                    >
+                      {assessmentData.riskLevel}
+                    </div>
+                    <div className="text-xs text-zinc-500 mt-1">
+                      Probability of default: {assessmentData.badProbability}%
+                    </div>
+                  </div>
+                </div>
+              </div>
+
+              {/* Dynamic Key Factors */}
+              <div className="rounded-2xl border shadow-xl p-6 sm:p-8 bg-white/80 backdrop-blur-lg">
+                <h4 className="text-lg font-semibold mb-4 text-indigo-700">
+                  Key Factors
+                </h4>
+                <ul className="space-y-3 text-sm">
+                  {assessmentData.keyFactors.map((factor, index) => (
+                    <li key={index} className="flex items-center gap-3">
+                      <span
+                        className={`size-6 grid place-items-center rounded-full ${
+                          factor.negative
+                            ? "bg-rose-50 text-rose-600"
+                            : "bg-emerald-50 text-emerald-600"
+                        }`}
+                      >
+                        ✓
+                      </span>
+                      <div className="flex-1">
+                        <div className="flex items-center justify-between text-sm">
+                          <span className="text-zinc-700">{factor.label}</span>
+                          <span
+                            className={`font-semibold ${
+                              factor.negative
+                                ? "text-rose-600"
+                                : "text-emerald-600"
+                            }`}
+                          >
+                            {factor.value}%
+                          </span>
+                        </div>
+                        <div className="h-2 rounded bg-zinc-100 mt-1">
+                          <div
+                            className={`h-2 rounded ${
+                              factor.negative ? "bg-rose-400" : "bg-emerald-500"
+                            }`}
+                            style={{ width: `${factor.value}%` }}
+                          />
+                        </div>
+                      </div>
+                    </li>
+                  ))}
                 </ul>
               </div>
             </div>
-          </div>
 
-          {/* Additional Insights */}
-          <div className="rounded-2xl border shadow-xl p-8 bg-white/80 backdrop-blur-lg">
-            <h4 className="text-base font-semibold mb-4 text-indigo-700">
-              Assessment Summary
-            </h4>
-            <div className="grid md:grid-cols-3 gap-4 sm:gap-6 text-sm">
-              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50">
-                <div className="text-2xl font-bold text-indigo-600 mb-1">
-                  {result.prediction}
+            {/* Dynamic Charts */}
+            <div className="grid md:grid-cols-2 gap-6 sm:gap-8">
+              {/* Dynamic Factor Analysis */}
+              <div className="rounded-2xl border shadow-xl p-6 sm:p-8 bg-white/80 backdrop-blur-lg">
+                <h4 className="text-lg font-semibold mb-4 text-indigo-700">
+                  Factor Analysis
+                </h4>
+                <div className="space-y-3">
+                  {assessmentData.factorAnalysis.map((factor) => (
+                    <div key={factor.k} className="text-sm">
+                      <div className="flex items-center justify-between mb-1">
+                        <span>{factor.k}</span>
+                        <span className="text-zinc-500">
+                          {Math.round(factor.v)}
+                        </span>
+                      </div>
+                      <div className="h-2 rounded bg-zinc-100">
+                        <div
+                          className="h-2 rounded bg-indigo-500"
+                          style={{
+                            width: `${Math.min(
+                              100,
+                              (factor.v /
+                                Math.max(
+                                  ...assessmentData.factorAnalysis.map((f) => f.v)
+                                )) *
+                                100
+                            )}%`,
+                          }}
+                        />
+                      </div>
+                    </div>
+                  ))}
                 </div>
-                <div className="text-xs text-indigo-500">Model Prediction</div>
               </div>
-              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-purple-50 to-violet-50">
-                <div className="text-2xl font-bold text-violet-600 mb-1">
-                  {result.model_version}
-                </div>
-                <div className="text-xs text-violet-500">Model Version</div>
-              </div>
-              <div className="text-center p-4 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50">
-                <div className="text-2xl font-bold text-emerald-600 mb-1">
-                  {result.threshold_used}
-                </div>
-                <div className="text-xs text-emerald-500">
-                  Decision Threshold
+
+              {/* Dynamic Risk Distribution */}
+              <div className="rounded-2xl border shadow-xl p-6 sm:p-8 bg-white/80 backdrop-blur-lg">
+                <h4 className="text-lg font-semibold mb-4 text-indigo-700">
+                  Risk Category Distribution
+                </h4>
+                {/* RESPONSIVE CHANGE: Stacks vertically on small screens */}
+                <div className="flex flex-col sm:flex-row items-center gap-4 sm:gap-6">
+                  {/* RESPONSIVE CHANGE: Resized SVG for smaller screens */}
+                  <div className="relative size-28 sm:size-32">
+                    <svg
+                      viewBox="0 0 36 36"
+                      className="size-28 sm:size-32 rotate-90 -scale-x-100"
+                    >
+                      <circle cx="18" cy="18" r="16" fill="#F3F4F6" />
+                      <path
+                        d="M18 2 a 16 16 0 0 1 0 32"
+                        fill="none"
+                        stroke="#22c55e"
+                        strokeWidth="4"
+                        strokeDasharray={`${assessmentData.riskDistribution.low} 100`}
+                      />
+                      <path
+                        d="M18 2 a 16 16 0 0 1 0 32"
+                        fill="none"
+                        stroke="#f59e0b"
+                        strokeWidth="4"
+                        strokeDasharray={`${assessmentData.riskDistribution.medium} 100`}
+                        strokeDashoffset={-assessmentData.riskDistribution.low}
+                      />
+                      <path
+                        d="M18 2 a 16 16 0 0 1 0 32"
+                        fill="none"
+                        stroke="#ef4444"
+                        strokeWidth="4"
+                        strokeDasharray={`${assessmentData.riskDistribution.high} 100`}
+                        strokeDashoffset={
+                          -(
+                            assessmentData.riskDistribution.low +
+                            assessmentData.riskDistribution.medium
+                          )
+                        }
+                      />
+                    </svg>
+                  </div>
+                  <ul className="text-sm space-y-2">
+                    <li>
+                      <span className="inline-block size-2.5 rounded-full bg-emerald-500 mr-2" />
+                      Low Risk: {assessmentData.riskDistribution.low}%
+                    </li>
+                    <li>
+                      <span className="inline-block size-2.5 rounded-full bg-amber-500 mr-2" />
+                      Medium Risk: {assessmentData.riskDistribution.medium}%
+                    </li>
+                    <li>
+                      <span className="inline-block size-2.5 rounded-full bg-rose-500 mr-2" />
+                      High Risk: {assessmentData.riskDistribution.high}%
+                    </li>
+                  </ul>
                 </div>
               </div>
             </div>
-            <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-slate-50 to-gray-50 border-l-4 border-indigo-500">
-              <p className="text-sm text-slate-600">
-                <strong className="text-indigo-700">
-                  Assessment Complete:
-                </strong>{" "}
-                Your credit risk analysis is based on{" "}
-                {fieldMeta.filter((f) => formData[f.key] !== "").length} data
-                points. The model shows a {assessmentData.badProbability}%
-                probability of default risk.
-                {assessmentData.badProbability < 20
-                  ? " This indicates strong creditworthiness."
-                  : assessmentData.badProbability < 50
-                  ? " This suggests moderate credit risk that may require additional review."
-                  : " This indicates higher risk that may impact credit decisions."}
-              </p>
+
+            {/* Additional Insights */}
+            <div className="rounded-2xl border shadow-xl p-6 sm:p-8 bg-white/80 backdrop-blur-lg">
+              <h4 className="text-lg font-semibold mb-4 text-indigo-700">
+                Assessment Summary
+              </h4>
+              <div className="grid md:grid-cols-3 gap-4 sm:gap-6 text-sm">
+                <div className="text-center p-4 rounded-lg bg-gradient-to-br from-blue-50 to-indigo-50">
+                  <div className="text-2xl font-bold text-indigo-600 mb-1">
+                    {result.prediction}
+                  </div>
+                  <div className="text-sm text-indigo-500">Model Prediction</div>
+                </div>
+                <div className="text-center p-4 rounded-lg bg-gradient-to-br from-purple-50 to-violet-50">
+                  <div className="text-2xl font-bold text-violet-600 mb-1">
+                    {result.model_version}
+                  </div>
+                  <div className="text-sm text-violet-500">Model Version</div>
+                </div>
+                <div className="text-center p-4 rounded-lg bg-gradient-to-br from-green-50 to-emerald-50">
+                  <div className="text-2xl font-bold text-emerald-600 mb-1">
+                    {result.threshold_used}
+                  </div>
+                  <div className="text-sm text-emerald-500">
+                    Decision Threshold
+                  </div>
+                </div>
+              </div>
+              <div className="mt-6 p-4 rounded-lg bg-gradient-to-r from-slate-50 to-gray-50 border-l-4 border-indigo-500">
+                <p className="text-base text-slate-600">
+                  <strong className="text-indigo-700">
+                    Assessment Complete:
+                  </strong>{" "}
+                  Your credit risk analysis is based on{" "}
+                  {fieldMeta.filter((f) => formData[f.key] !== "").length} data
+                  points. The model shows a {assessmentData.badProbability}%
+                  probability of default risk.
+                  {assessmentData.badProbability < 20
+                    ? " This indicates strong creditworthiness."
+                    : assessmentData.badProbability < 50
+                    ? " This suggests moderate credit risk that may require additional review."
+                    : " This indicates higher risk that may impact credit decisions."}
+                </p>
+              </div>
             </div>
-          </div>
-        </section>
-      )}
+          </section>
+        )}
+      </main>
 
       {/* Footer */}
-      <footer className="mt-auto bg-gradient-to-br from-zinc-950 via-indigo-950 to-violet-950 text-zinc-200 relative z-10 border-t border-indigo-900 shadow-inner text-xs sm:text-sm">
-        <div className="mx-auto max-w-6xl px-2 sm:px-4 py-8 sm:py-12 grid grid-cols-1 md:grid-cols-5 gap-6 sm:gap-10">
+      <footer id="contact" className="bg-gradient-to-br from-zinc-950 via-indigo-950 to-violet-950 text-zinc-200 relative z-10 border-t border-indigo-900 shadow-inner text-sm">
+        <div className="mx-auto max-w-6xl px-4 sm:px-6 py-10 sm:py-12 grid grid-cols-1 sm:grid-cols-2 md:grid-cols-5 gap-8 sm:gap-10">
           {/* Brand */}
-          <div className="md:col-span-2 space-y-3">
+          <div className="sm:col-span-2 md:col-span-2 space-y-3">
             <div className="flex items-center gap-3 text-white mb-2">
               {/* Example SVG logo */}
               <span className="inline-flex items-center justify-center h-8 w-8 rounded-full bg-gradient-to-br from-indigo-500 to-violet-600 shadow-lg">
@@ -1093,7 +1107,7 @@ export default function GetStarted() {
           </div>
         </div>
         <div className="border-t border-indigo-900/50 text-xs text-zinc-400 bg-zinc-950/80">
-          <div className="mx-auto max-w-6xl px-2 sm:px-4 py-4 sm:py-5 flex flex-col md:flex-row items-center justify-between gap-2">
+          <div className="mx-auto max-w-6xl px-4 sm:px-6 py-4 sm:py-5 flex flex-col md:flex-row items-center justify-between gap-2">
             <div>
               © 2025{" "}
               <span className="font-semibold text-indigo-300">CreditSense</span>

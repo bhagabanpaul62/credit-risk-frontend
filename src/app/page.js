@@ -6,9 +6,6 @@ import { ArrowRight, Shield, Users } from "lucide-react";
 import Image from "next/image";
 
 export default function ScardLandingPage({
-  // Logo and Brand Images
-  // ,
-
   // Mobile App Screenshots
   mobileAppScreenshot = "/hand_phone.jpg",
 
@@ -18,10 +15,6 @@ export default function ScardLandingPage({
 
   // Background Images
   backgroundImage = null,
-
-  // Icon Images (optional - will fallback to Lucide icons)
-  securityIcon = null,
-  networkIcon = null,
 
   // Decorative Images
   sparkleIcon = null,
@@ -50,14 +43,14 @@ export default function ScardLandingPage({
 
       {/* HERO SECTION: Main Content Container + CTA Buttons */}
       <motion.div
-        className="relative px-4 sm:px-6 lg:px-12 min-h-screen flex items-center"
+        className="relative px-4 sm:px-6 lg:px-12 min-h-screen flex flex-col lg:flex-row items-center justify-center py-16 lg:py-0"
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 1.2, ease: "easeOut" }}
       >
         <div className="max-w-7xl mx-auto w-full">
           <div className="grid lg:grid-cols-2 gap-8 lg:gap-20 items-center">
-            {/* Left Content */}
+            {/* Left Content: Text and CTAs */}
             <motion.div
               className="space-y-6 sm:space-y-8 lg:space-y-10 text-center lg:text-left"
               initial={{ opacity: 0, x: -60 }}
@@ -132,7 +125,6 @@ export default function ScardLandingPage({
                 animate={{ opacity: 1, y: 0 }}
                 transition={{ duration: 0.6, delay: 1.3 }}
               >
-                {/* Primary CTA */}
                 <motion.button
                   className="relative inline-flex items-center justify-center gap-3 rounded-full px-6 sm:px-8 py-3.5 text-sm font-semibold text-black bg-gradient-to-r from-lime-400 via-purple-400 to-indigo-500 shadow-lg hover:shadow-xl focus:outline-none focus:ring-4 focus:ring-lime-400/40 transition-shadow w-full sm:w-auto"
                   onClick={() => router.push("/getstarted")}
@@ -142,7 +134,6 @@ export default function ScardLandingPage({
                   <ArrowRight className="w-5 h-5" />
                 </motion.button>
 
-                {/* Secondary CTA */}
                 <motion.button
                   className="relative inline-flex items-center justify-center gap-2 rounded-full px-6 sm:px-8 py-3.5 text-sm font-medium text-white/80 border border-white/25 hover:text-white hover:border-lime-400/50 focus:outline-none focus:ring-4 focus:ring-purple-400/30 transition-colors w-full sm:w-auto"
                   onClick={() => router.push("/howtouse")}
@@ -154,9 +145,10 @@ export default function ScardLandingPage({
               </motion.div>
             </motion.div>
 
-            {/* Right Content - Enhanced 3-Card Showcase */}
+            {/* Right Content: Enhanced 3-Card Showcase */}
+            {/* REMOVED 'order-first lg:order-last' and increased mobile margin-top */}
             <motion.div
-              className="relative mt-8 lg:mt-0 order-first lg:order-last"
+              className="relative mt-16 lg:mt-0 mb-11"
               initial={{ opacity: 0, x: 60 }}
               animate={{ opacity: 1, x: 0 }}
               transition={{
@@ -672,31 +664,3 @@ function ThreeCardShowcase({ primaryCardImage, secondaryCardImage }) {
     </div>
   );
 }
-
-// Custom Animations (add to your global CSS or Tailwind config)
-/*
-@keyframes fade-in {
-  0% { opacity: 0; transform: translateY(20px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-@keyframes fade-in-up {
-  0% { opacity: 0; transform: translateY(40px); }
-  100% { opacity: 1; transform: translateY(0); }
-}
-@keyframes glow {
-  0%, 100% { box-shadow: 0 0 20px 5px #a3e63544, 0 0 40px 10px #a78bfa33; }
-  50% { box-shadow: 0 0 40px 10px #a3e63599, 0 0 80px 20px #a78bfa66; }
-}
-@keyframes float {
-  0%, 100% { transform: translateY(0) rotate(12deg); }
-  50% { transform: translateY(-16px) rotate(12deg); }
-}
-@keyframes float-reverse {
-  0%, 100% { transform: translateY(0) rotate(-12deg); }
-  50% { transform: translateY(16px) rotate(-12deg); }
-}
-@keyframes spin-slow {
-  0% { transform: rotate(0deg); }
-  100% { transform: rotate(360deg); }
-}
-*/
